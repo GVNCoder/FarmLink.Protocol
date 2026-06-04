@@ -220,9 +220,10 @@ Each message type has a specific payload structure:
 |------|---------|-------------|------------------|
 | `0x00` | OFF | Turn off device or component | None (0 bytes) |
 | `0x01` | ON | Turn on device or component | 4 bytes: Duration in seconds (0 = indefinite) |
-| `0x02` | ADJ | Adjust device settings | Variable: setting-specific parameters |
-| `0x03` | RST | Reset device to default state | 1 byte: Reset type (0x00 = soft, 0x01 = hard) |
-| `0x04` | EXC | Execute specific action sequence | Variable: action-specific parameters |
+| `0x02` | TGL | Toggle device state | None (0 bytes) |
+| `0x03` | ADJ | Adjust device settings | Variable: setting-specific parameters |
+| `0x04` | RST | Reset device to default state | 1 byte: Reset type (0x00 = soft, 0x01 = hard) |
+| `0x05` | EXC | Execute specific action sequence | Variable: action-specific parameters |
 
 **Example - ON Command for Pump**:
 ```
