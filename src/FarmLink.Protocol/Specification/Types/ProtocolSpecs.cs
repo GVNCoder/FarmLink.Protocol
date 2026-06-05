@@ -47,4 +47,9 @@ public static class ProtocolSpecs
     /// The size of the Payload Length field in the FarmLink protocol, in bytes.
     /// </summary>
     public const int PayloadLengthSize = sizeof(int);
+
+    /// <summary>
+    /// The size of the Protocol Version field in the FarmLink protocol, in bytes.
+    /// </summary>
+    public const int ProtocolVersionSize = sizeof(byte);
 }
