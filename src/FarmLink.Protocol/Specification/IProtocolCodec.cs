@@ -8,6 +8,11 @@ namespace FarmLink.Protocol.Specification;
 public interface IProtocolCodec
 {
     /// <summary>
+    /// Gets the protocol version that this codec supports.
+    /// </summary>
+    public ProtocolVersion ProtocolVersion { get; }
+
+    /// <summary>
     /// Encodes a FarmLink Protocol Message into a byte span.
     /// </summary>
     /// <param name="message">The message to encode.</param>

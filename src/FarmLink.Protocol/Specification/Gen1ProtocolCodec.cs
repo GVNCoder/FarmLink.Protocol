@@ -5,8 +5,14 @@ namespace FarmLink.Protocol.Specification;
 
 public sealed class Gen1ProtocolCodec : IProtocolCodec
 {
+    public ProtocolVersion ProtocolVersion => ProtocolVersion.Gen1;
+
     public ProtocolDecodeResult Decode(ReadOnlySpan<byte> frame)
     {
+        // Nothing to decode if the frame is empty
+        if (frame.Length is 0)
+            return ProtocolDecodeResult.Failed();
+
         /* Protocol Constraints
          * - Maximum Payload Length: 1024 bytes (adjustable for device capabilities)
          * - Maximum Total Message Size: 1040 bytes (20-byte overhead + 1024-byte payload)
@@ -88,14 +94,19 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
 
         // Read Payload Block (variable length)
         var payloadSlice = frame.Slice(position, payloadLength);
+        position += payloadLength;
+
+        var message = new Message
+        {
+            ProtocolVersion = ProtocolVersion.Gen1,
+            DeviceID = deviceID,
+            MessageID = messageID,
+            MessageType = messageType,
+            Payload = payloadSlice.ToArray()
+        };
 
         // Create a message object with the decoded values
-        return ProtocolDecodeResult.Successful(new Message(
-            ProtocolVersion: ProtocolVersion.Gen1,
-            DeviceID: deviceID,
-            MessageID: messageID,
-            MessageType: messageType,
-            Payload: payloadSlice.ToArray()));
+        return ProtocolDecodeResult.Successful(message, consumedBytes: position);
     }
 
     public void Encode(Message message, Span<byte> buffer)
@@ -111,7 +122,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
         var position = 0;
 
         // Encode Protocol Version
-        buffer[position] = (byte)message.ProtocolVersion;
+        buffer[position] = (byte)ProtocolVersion;
 
         // Move position forward by Protocol Version size
         position += ProtocolSpecs.ProtocolVersionSize;
