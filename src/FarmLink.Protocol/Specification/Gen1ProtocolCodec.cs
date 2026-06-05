@@ -31,18 +31,28 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
         // we need to decode its components first and then check if they meet the specified limits.
         var position = 0;
 
+        // Read Protocol Version (1 byte)
+        var protocolVersion = (ProtocolVersion)frame[position];
+
+        // Validate Protocol Version
+        if (protocolVersion != ProtocolVersion)
+            return ProtocolDecodeResult.Failed();
+
+        // Move position forward by Protocol Version size
+        position += ProtocolSpecs.ProtocolVersionSize;
+
         // Read Device ID (2 bytes LE)
         var deviceIDSlice = frame.Slice(position, ProtocolSpecs.DeviceIDSize);
         var deviceID = BinaryPrimitives.ReadInt16LittleEndian(deviceIDSlice);
-
-        // Move position forward by Device ID size
-        position += ProtocolSpecs.DeviceIDSize;
 
         // Validate Device ID
         // Device IDs must be in the range 0x0001 to 0xFFFF
         // 0 means Invalid/Unassigned
         if (deviceID is 0)
             return ProtocolDecodeResult.Failed();
+
+        // Move position forward by Device ID size
+        position += ProtocolSpecs.DeviceIDSize;
 
         // Read Message ID (4 bytes LE)
         var messageIDSlice = frame.Slice(position, ProtocolSpecs.MessageIDSize);
@@ -57,8 +67,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
         position += ProtocolSpecs.MessageIDSize;
 
         // Read Message Type (1 byte)
-        var messageTypeSlice = frame.Slice(position, ProtocolSpecs.MessageTypeSize);
-        var messageType = (MessageType)messageTypeSlice[0];
+        var messageType = (MessageType)frame[position];
 
         // Validate Message Type
         // Message Type must be a defined value in the MessageType enum
