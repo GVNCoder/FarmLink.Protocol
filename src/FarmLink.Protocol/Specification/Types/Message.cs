@@ -1,4 +1,4 @@
-﻿namespace FarmLink.Protocol.Specification;
+﻿namespace FarmLink.Protocol.Specification.Types;
 
 public ref struct Message
 {
