@@ -27,4 +27,24 @@ public static class ProtocolSpecs
     /// The maximum size of a message in the FarmLink protocol, including the overhead and the maximum payload.
     /// </summary>
     public const int MaxMessageSize = MinMessageSize + MaxMessagePayloadSize;
+
+    /// <summary>
+    /// The size of the Device ID field in the FarmLink protocol, in bytes.
+    /// </summary>
+    public const int DeviceIDSize = sizeof(short);
+
+    /// <summary>
+    /// The size of the Message ID field in the FarmLink protocol, in bytes.
+    /// </summary>
+    public const int MessageIDSize = sizeof(int);
+
+    /// <summary>
+    /// The size of the Message Type field in the FarmLink protocol, in bytes.
+    /// </summary>
+    public const int MessageTypeSize = sizeof(byte);
+
+    /// <summary>
+    /// The size of the Payload Length field in the FarmLink protocol, in bytes.
+    /// </summary>
+    public const int PayloadLengthSize = sizeof(int);
 }
