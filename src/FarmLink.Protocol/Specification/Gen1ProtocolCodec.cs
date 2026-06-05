@@ -98,8 +98,51 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
             Payload: payloadSlice.ToArray()));
     }
 
-    public ReadOnlySpan<byte> Encode(Message message)
+    public void Encode(Message message, Span<byte> buffer)
     {
-        throw new NotImplementedException();
+        // Compute the total message size
+        var messageSize = ProtocolSpecs.MinMessageSize + message.Payload.Length;
+
+        // Validate the message size and buffer size compliance
+        ValidateMessageAndBufferSizeCompliance(messageSize, buffer.Length);
+
+        // Allocate a buffer for the encoded message
+        // Span<byte> buffer = stackalloc byte[messageSize];
+        var position = 0;
+
+        // Encode Protocol Version
+        buffer[position] = (byte)message.ProtocolVersion;
+
+        // Move position forward by Protocol Version size
+        position += ProtocolSpecs.ProtocolVersionSize;
+
+        // Encode Device ID (2 bytes LE)
+        BinaryPrimitives.WriteInt16LittleEndian(buffer.Slice(position, ProtocolSpecs.DeviceIDSize), message.DeviceID);
+        position += ProtocolSpecs.DeviceIDSize;
+
+        // Encode Message ID (4 bytes LE)
+        BinaryPrimitives.WriteInt32LittleEndian(buffer.Slice(position, ProtocolSpecs.MessageIDSize), message.MessageID);
+        position += ProtocolSpecs.MessageIDSize;
+
+        // Encode Message Type (1 byte)
+        buffer[position] = (byte)message.MessageType;
+        position += ProtocolSpecs.MessageTypeSize;
+
+        // Encode Payload Length (4 bytes LE)
+        BinaryPrimitives.WriteInt32LittleEndian(buffer.Slice(position, ProtocolSpecs.PayloadLengthSize), message.Payload.Length);
+        position += ProtocolSpecs.PayloadLengthSize;
+
+        // Encode Payload Block (variable length)
+        message.Payload.CopyTo(buffer.Slice(position, message.Payload.Length));
+    }
+
+    private static void ValidateMessageAndBufferSizeCompliance(int messageSize, int allocatedBufferSize)
+    {
+        if (messageSize > ProtocolSpecs.MaxMessageSize)
+            throw new ArgumentException($"Message size exceeds protocol limits. Maximum allowed size: {ProtocolSpecs.MaxMessageSize} bytes.", nameof(messageSize));
+        if (allocatedBufferSize < messageSize)
+            throw new ArgumentException($"Provided buffer is too small. Required size: {messageSize} bytes.", nameof(allocatedBufferSize));
+        if (allocatedBufferSize > messageSize)
+            throw new ArgumentException($"Provided buffer is larger than necessary. Required size: {messageSize} bytes.", nameof(allocatedBufferSize));
     }
 }

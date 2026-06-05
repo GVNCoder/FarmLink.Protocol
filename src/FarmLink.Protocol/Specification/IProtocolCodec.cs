@@ -11,8 +11,8 @@ public interface IProtocolCodec
     /// Encodes a FarmLink Protocol Message into a byte span.
     /// </summary>
     /// <param name="message">The message to encode.</param>
-    /// <returns>A byte span representing the encoded message.</returns>
-    ReadOnlySpan<byte> Encode(Message message);
+    /// <param name="buffer">The buffer to write the encoded message into.</param>
+    void Encode(Message message, Span<byte> buffer);
 
     /// <summary>
     /// Decodes a byte span into a FarmLink Protocol Message.
