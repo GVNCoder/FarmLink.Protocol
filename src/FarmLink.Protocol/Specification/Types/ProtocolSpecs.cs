@@ -21,12 +21,22 @@ public static class ProtocolSpecs
     /// <summary>
     /// The minimum size of a message in the FarmLink protocol, including the overhead with zero-length payload.
     /// </summary>
-    public const int MinMessageSize = 20;
+    public const int MinMessageSize = HeaderSize;
     
     /// <summary>
     /// The maximum size of a message in the FarmLink protocol, including the overhead and the maximum payload.
     /// </summary>
-    public const int MaxMessageSize = MinMessageSize + MaxMessagePayloadSize;
+    public const int MaxMessageSize = HeaderSize + MaxMessagePayloadSize;
+
+    /// <summary>
+    /// The size of the message header in the FarmLink protocol, in bytes.
+    /// </summary>
+    public const int HeaderSize =
+        ProtocolVersionSize +
+        DeviceIDSize +
+        MessageIDSize +
+        MessageTypeSize +
+        PayloadLengthSize;
 
     /// <summary>
     /// The size of the Device ID field in the FarmLink protocol, in bytes.
