@@ -11,7 +11,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
     {
         // Nothing to decode if the frame is empty
         if (frame.Length is 0)
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.FrameEmpty);
 
         /* Protocol Constraints
          * - Maximum Payload Length: 1024 bytes (adjustable for device capabilities)
@@ -36,7 +36,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
 
         // Validate Protocol Version
         if (protocolVersion != ProtocolVersion)
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.UnrecognizedProtocolVersion);
 
         // Move position forward by Protocol Version size
         position += ProtocolSpecs.ProtocolVersionSize;
@@ -49,7 +49,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
         // Device IDs must be in the range 0x0001 to 0xFFFF
         // 0 means Invalid/Unassigned
         if (deviceID is 0)
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.InvalidDeviceID);
 
         // Move position forward by Device ID size
         position += ProtocolSpecs.DeviceIDSize;
@@ -61,7 +61,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
         // Validate Message ID
         // Message IDs must be positive integers (1 to 0x7FFFFFFF)
         if (messageID <= 0)
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.InvalidMessageID);
 
         // Move position forward by Message ID size
         position += ProtocolSpecs.MessageIDSize;
@@ -73,7 +73,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
         // Message Type must be a defined value in the MessageType enum
         // TODO: can be validated much faster by checking if the byte value is within the valid range of enum values
         if (!Enum.IsDefined<MessageType>(messageType))
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.InvalidMessageType);
 
         // Move position forward by Message Type size
         position += ProtocolSpecs.MessageTypeSize;
@@ -84,19 +84,19 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
 
         // Validate Payload Length value
         if (payloadLength < 0)
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.InvalidPayloadLength);
 
         // Validate Payload Length against protocol constraints
         if (payloadLength > ProtocolSpecs.MaxMessagePayloadSize)
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.InvalidPayloadLength);
 
         // Validate Total Message Size against protocol constraints
         if (position + payloadLength > ProtocolSpecs.MaxMessageSize)
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.InvalidPayloadLength);
 
         // Check if the frame has enough bytes for the payload
         if (frame.Length - position < payloadLength)
-            return ProtocolDecodeResult.Failed();
+            return ProtocolDecodeResult.Failed(DecodingError.InvalidPayloadLength);
 
         // Move position forward by Payload Length size
         position += ProtocolSpecs.PayloadLengthSize;

@@ -10,7 +10,8 @@ namespace FarmLink.Protocol.Specification;
 public record struct ProtocolDecodeResult(
     Message? Message,
     bool Success,
-    int ConsumedBytes)
+    int ConsumedBytes,
+    DecodingError? Error)
 {
     /// <summary>
     /// Creates a successful decode result with the given message.
@@ -18,11 +19,11 @@ public record struct ProtocolDecodeResult(
     /// <param name="message">The decoded message.</param>
     /// <param name="consumedBytes">The number of bytes consumed during decoding.</param>
     /// <returns>A successful ProtocolDecodeResult containing the message.</returns>
-    public static ProtocolDecodeResult Successful(Message message, int consumedBytes) => new (message, true, consumedBytes);
+    public static ProtocolDecodeResult Successful(Message message, int consumedBytes) => new (message, true, consumedBytes, null);
 
     /// <summary>
     /// Creates a failed decode result.
     /// </summary>
     /// <returns>A failed ProtocolDecodeResult with no message.</returns>
-    public static ProtocolDecodeResult Failed() => new (null, false, 0);
+    public static ProtocolDecodeResult Failed(DecodingError error) => new (null, false, 0, error);
 }
