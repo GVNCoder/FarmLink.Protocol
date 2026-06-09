@@ -17,12 +17,12 @@ public interface IProtocolCodec
     /// </summary>
     /// <param name="message">The message to encode.</param>
     /// <param name="buffer">The buffer to write the encoded message into.</param>
-    void Encode(Message message, Span<byte> buffer);
+    void Encode(Message message, ref Span<byte> buffer);
 
     /// <summary>
     /// Decodes a byte span into a FarmLink Protocol Message.
     /// </summary>
     /// <param name="frame">The byte span to decode.</param>
     /// <returns>The result of the decoding operation.</returns>
-    ProtocolDecodeResult Decode(ReadOnlySpan<byte> frame);
+    ProtocolDecodeResult Decode(ref ReadOnlySpan<byte> frame);
 }

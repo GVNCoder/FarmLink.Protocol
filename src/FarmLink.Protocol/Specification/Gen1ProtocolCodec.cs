@@ -7,7 +7,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
 {
     public ProtocolVersion ProtocolVersion => ProtocolVersion.Gen1;
 
-    public ProtocolDecodeResult Decode(ReadOnlySpan<byte> frame)
+    public ProtocolDecodeResult Decode(ref ReadOnlySpan<byte> frame)
     {
         // Nothing to decode if the frame is empty
         if (frame.Length is 0)
@@ -118,7 +118,7 @@ public sealed class Gen1ProtocolCodec : IProtocolCodec
         return ProtocolDecodeResult.Successful(message, consumedBytes: position);
     }
 
-    public void Encode(Message message, Span<byte> buffer)
+    public void Encode(Message message, ref Span<byte> buffer)
     {
         // Compute the total message size
         var messageSize = ProtocolSpecs.MinMessageSize + message.Payload.Length;
